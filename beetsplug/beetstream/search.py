@@ -1,7 +1,6 @@
 from beetsplug.beetstream.utils import *
 from beetsplug.beetstream import app
-from flask import g, request, Response
-import xml.etree.cElementTree as ET
+from flask import g, request
 
 @app.route('/rest/search2', methods=["GET", "POST"])
 @app.route('/rest/search2.view', methods=["GET", "POST"])
