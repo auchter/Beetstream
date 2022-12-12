@@ -158,10 +158,6 @@ def map_song(song):
         "type": "music"
     }
 
-def map_song_xml(xml, song):
-    for k, v in map_song(song).items():
-        xml.set(k, str(v))
-
 def map_artist(artist_name):
     return {
         "id": artist_name_to_id(artist_name),
