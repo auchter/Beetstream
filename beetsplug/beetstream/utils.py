@@ -36,23 +36,33 @@ def response_to_xml(d, parent=None):
 
     return element
 
-def subsonic_response(request, d):
+def subsonic_response(request, d, ok=True):
     fmt = request.values.get('f') or 'xml'
 
     response = {
         "subsonic-response": {
-            "status": "ok",
+            "status": "ok" if ok else "failed",
             "version": "1.16.1",
+            **d,
         }
     }
 
-    response["subsonic-response"].update(d)
     if fmt == "xml":
         response["subsonic-response"]["xmlns"] = "http://subsonic.org/restapi"
         xml = response_to_xml(response)
         return flask.Response(xml_to_string(xml), mimetype='text/xml')
     else:
         return jsonpify(request, response)
+
+def subsonic_response_error(request, code, message=""):
+    d = {
+        "error": {
+            "code": code,
+            "message": message,
+        }
+    }
+
+    return subsonic_response(request, d, ok=False)
 
 def jsonpify(request, data):
     if request.values.get("f") == "jsonp":
