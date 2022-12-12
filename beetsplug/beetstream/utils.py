@@ -25,7 +25,7 @@ def response_to_xml(d, parent=None):
         if type(v) is list:
             for val in v:
                 if type(val) is dict:
-                    sub = ET.SubElement(element, k, attrib={k: str(v) for k, v in val.items()})
+                    response_to_xml({k: val}, parent=element)
                 else:
                     sub = ET.SubElement(element, k)
                     sub.text = str(val)
