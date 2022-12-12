@@ -102,10 +102,6 @@ def map_album(album):
         "averageRating": 0 # TODO
     }
 
-def map_album_xml(xml, album):
-    for k, v in map_album(album).items():
-        xml.set(k, str(v))
-
 def map_album_list(album):
     album = dict(album)
     return {
