@@ -1,8 +1,7 @@
 import time
 from beetsplug.beetstream.utils import *
 from beetsplug.beetstream import app
-from flask import g, request, Response
-import xml.etree.cElementTree as ET
+from flask import g, request
 
 @app.route('/rest/getArtists', methods=["GET", "POST"])
 @app.route('/rest/getArtists.view', methods=["GET", "POST"])
