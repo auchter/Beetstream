@@ -14,7 +14,6 @@ def search3():
     return search(3)
 
 def search(version):
-    res_format = request.values.get('f') or 'xml'
     query = request.values.get('query') or ""
     artistCount = int(request.values.get('artistCount') or 20)
     artistOffset = int(request.values.get('artistOffset') or 0)
@@ -33,26 +32,10 @@ def search(version):
     artists.sort(key=lambda name: strip_accents(name).upper())
     artists = handleSizeAndOffset(artists, artistCount, artistOffset)
 
-    if (is_json(res_format)):
-        return jsonpify(request, wrap_res("searchResult{}".format(version), {
+    return subsonic_response(request, {
+        "searchResult{}".format(version): {
             "artist": list(map(map_artist, artists)),
             "album": list(map(map_album, albums)),
             "song": list(map(map_song, songs))
-        }))
-    else:
-        root = get_xml_root()
-        search_result = ET.SubElement(root, 'searchResult{}'.format(version))
-
-        for artist in artists:
-            a = ET.SubElement(search_result, 'artist')
-            map_artist_xml(a, artist)
-
-        for album in albums:
-            a = ET.SubElement(search_result, 'album')
-            map_album_xml(a, album)
-
-        for song in songs:
-            s = ET.SubElement(search_result, 'song')
-            map_song_xml(s, song)
-
-        return Response(xml_to_string(root), mimetype='text/xml')
+        }
+    })
