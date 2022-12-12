@@ -1,8 +1,7 @@
 from beetsplug.beetstream.utils import *
 from beetsplug.beetstream import app
 import flask
-from flask import g, request, Response
-import xml.etree.cElementTree as ET
+from flask import g, request
 from PIL import Image
 import io
 from random import shuffle
