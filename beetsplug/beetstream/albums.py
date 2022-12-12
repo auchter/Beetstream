@@ -116,7 +116,6 @@ def cover_art_file():
 @app.route('/rest/getGenres', methods=["GET", "POST"])
 @app.route('/rest/getGenres.view', methods=["GET", "POST"])
 def genres():
-    res_format = request.values.get('f') or 'xml'
     with g.lib.transaction() as tx:
         mixed_genres = list(tx.query("""
             SELECT genre, COUNT(*) AS n_song, "" AS n_album FROM items GROUP BY genre
@@ -138,28 +137,16 @@ def genres():
     genres.reverse()
     genres = filter(lambda genre: genre[0] != u"", genres)
 
-    if (is_json(res_format)):
-        def map_genre(genre):
-            return {
-                "value": genre[0],
-                "songCount": genre[1],
-                "albumCount": genre[2]
-            }
+    def map_genre(genre):
+        return {
+            "value": genre[0],
+            "songCount": genre[1],
+            "albumCount": genre[2]
+        }
 
-        return jsonpify(request, wrap_res("genres", {
-            "genre": list(map(map_genre, genres))
-        }))
-    else:
-        root = get_xml_root()
-        genres_xml = ET.SubElement(root, 'genres')
-
-        for genre in genres:
-            genre_xml = ET.SubElement(genres_xml, 'genre')
-            genre_xml.text = genre[0]
-            genre_xml.set("songCount", str(genre[1]))
-            genre_xml.set("albumCount", str(genre[2]))
-
-        return Response(xml_to_string(root), mimetype='text/xml')
+    return subsonic_response(request, {
+        "genre": list(map(map_genre, genres))
+    })
 
 @app.route('/rest/getMusicDirectory', methods=["GET", "POST"])
 @app.route('/rest/getMusicDirectory.view', methods=["GET", "POST"])
