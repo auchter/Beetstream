@@ -69,24 +69,8 @@ def map_album(album):
     }
 
 def map_album_xml(xml, album):
-    album = dict(album)
-    xml.set("id", album_beetid_to_subid(str(album["id"])))
-    xml.set("name", album["album"])
-    xml.set("title", album["album"])
-    xml.set("album", album["album"])
-    xml.set("artist", album["albumartist"])
-    xml.set("artistId", artist_name_to_id(album["albumartist"]))
-    xml.set("parent", artist_name_to_id(album["albumartist"]))
-    xml.set("isDir", "true")
-    xml.set("coverArt", album_beetid_to_subid(str(album["id"])) or "")
-    xml.set("songCount", str(1)) # TODO
-    xml.set("duration", str(1)) # TODO
-    xml.set("playCount", str(1)) # TODO
-    xml.set("created", timestamp_to_iso(album["added"]))
-    xml.set("year", str(album["year"]))
-    xml.set("genre", album["genre"])
-    xml.set("starred", "1970-01-01T00:00:00.000Z") # TODO
-    xml.set("averageRating", "0") # TODO
+    for k, v in map_album(album).items():
+        xml.set(k, str(v))
 
 def map_album_list(album):
     album = dict(album)
@@ -108,21 +92,8 @@ def map_album_list(album):
     }
 
 def map_album_list_xml(xml, album):
-    album = dict(album)
-    xml.set("id", album_beetid_to_subid(str(album["id"])))
-    xml.set("parent", artist_name_to_id(album["albumartist"]))
-    xml.set("isDir", "true")
-    xml.set("title", album["album"])
-    xml.set("album", album["album"])
-    xml.set("artist", album["albumartist"])
-    xml.set("year", str(album["year"]))
-    xml.set("genre", album["genre"])
-    xml.set("coverArt", album_beetid_to_subid(str(album["id"])) or "")
-    xml.set("userRating", "5") # TODO
-    xml.set("averageRating", "5") # TODO
-    xml.set("playCount", "1")  # TODO
-    xml.set("created", timestamp_to_iso(album["added"]))
-    xml.set("starred", "")
+    for k, v in map_album_list(album).items():
+        xml.set(k, str(v))
 
 def map_song(song):
     song = dict(song)
@@ -154,30 +125,8 @@ def map_song(song):
     }
 
 def map_song_xml(xml, song):
-    song = dict(song)
-    path = song["path"].decode('utf-8')
-    xml.set("id", song_beetid_to_subid(str(song["id"])))
-    xml.set("parent", album_beetid_to_subid(str(song["album_id"])))
-    xml.set("isDir", "false")
-    xml.set("title", song["title"])
-    xml.set("name", song["title"])
-    xml.set("album", song["album"])
-    xml.set("artist", song["albumartist"])
-    xml.set("track", str(song["track"]))
-    xml.set("year", str(song["year"]))
-    xml.set("genre", song["genre"])
-    xml.set("coverArt", album_beetid_to_subid(str(song["album_id"])) or "")
-    xml.set("size", str(os.path.getsize(path)))
-    xml.set("contentType", mimetypes.guess_type(path)[0])
-    xml.set("suffix", song["format"].lower())
-    xml.set("duration", str(ceil(song["length"])))
-    xml.set("bitRate", str(ceil(song["bitrate"]/1000)))
-    xml.set("path", path)
-    xml.set("playCount", str(1)) #TODO
-    xml.set("created", timestamp_to_iso(song["added"]))
-    xml.set("albumId", album_beetid_to_subid(str(song["album_id"])))
-    xml.set("artistId", artist_name_to_id(song["albumartist"]))
-    xml.set("type", "music")
+    for k, v in map_song(song).items():
+        xml.set(k, str(v))
 
 def map_artist(artist_name):
     return {
@@ -191,11 +140,8 @@ def map_artist(artist_name):
     }
 
 def map_artist_xml(xml, artist_name):
-    xml.set("id", artist_name_to_id(artist_name))
-    xml.set("name", artist_name)
-    xml.set("coverArt", "")
-    xml.set("albumCount", "1")
-    xml.set("artistImageUrl", "https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg")
+    for k, v in map_artist(artist_name).items():
+        xml.set(k, str(v))
 
 def artist_name_to_id(name):
     base64_name = base64.b64encode(name.encode('utf-8')).decode('utf-8')
