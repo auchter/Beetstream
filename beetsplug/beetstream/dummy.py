@@ -1,7 +1,6 @@
 from beetsplug.beetstream.utils import *
 from beetsplug.beetstream import app
-from flask import request, Response
-import xml.etree.cElementTree as ET
+from flask import request
 
 # Fake endpoint to avoid some apps errors
 @app.route('/rest/scrobble', methods=["GET", "POST"])
