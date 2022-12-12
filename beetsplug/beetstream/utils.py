@@ -173,10 +173,6 @@ def map_artist(artist_name):
         "artistImageUrl": "https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg"
     }
 
-def map_artist_xml(xml, artist_name):
-    for k, v in map_artist(artist_name).items():
-        xml.set(k, str(v))
-
 def artist_name_to_id(name):
     base64_name = base64.b64encode(name.encode('utf-8')).decode('utf-8')
     return f"{ARTIST_ID_PREFIX}{base64_name}"
