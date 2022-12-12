@@ -15,7 +15,6 @@ def indexes():
     return get_artists("indexes")
 
 def get_artists(version):
-    res_format = request.values.get('f') or 'xml'
     with g.lib.transaction() as tx:
         rows = tx.query("SELECT DISTINCT albumartist FROM albums")
     all_artists = [row[0] for row in rows]
@@ -30,40 +29,20 @@ def get_artists(version):
             indicies_dict[index] = []
         indicies_dict[index].append(name)
 
-    if (is_json(res_format)):
-        indicies = []
-        for index, artist_names in indicies_dict.items():
-            indicies.append({
-                "name": index,
-                "artist": list(map(map_artist, artist_names))
-            })
+    indicies = []
+    for index, artist_names in indicies_dict.items():
+        indicies.append({
+            "name": index,
+            "artist": list(map(map_artist, artist_names))
+        })
 
-        return jsonpify(request, wrap_res(version, {
+    return subsonic_response(request, {
+        version: {
             "ignoredArticles": "",
             "lastModified": int(time.time() * 1000),
             "index": indicies
-        }))
-    else:
-        root = get_xml_root()
-        indexes_xml = ET.SubElement(root, version)
-        indexes_xml.set('ignoredArticles', "")
-
-        indicies = []
-        for index, artist_names in indicies_dict.items():
-            indicies.append({
-                "name": index,
-                "artist": artist_names
-            })
-
-        for index in indicies:
-            index_xml = ET.SubElement(indexes_xml, 'index')
-            index_xml.set('name', index["name"])
-
-            for a in index["artist"]:
-                artist = ET.SubElement(index_xml, 'artist')
-                map_artist_xml(artist, a)
-
-        return Response(xml_to_string(root), mimetype='text/xml')
+        }
+    })
 
 @app.route('/rest/getArtist', methods=["GET", "POST"])
 @app.route('/rest/getArtist.view', methods=["GET", "POST"])
