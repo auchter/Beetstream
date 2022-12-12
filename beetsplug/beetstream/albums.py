@@ -10,28 +10,17 @@ from random import shuffle
 @app.route('/rest/getAlbum', methods=["GET", "POST"])
 @app.route('/rest/getAlbum.view', methods=["GET", "POST"])
 def get_album():
-    res_format = request.values.get('f') or 'xml'
     id = int(album_subid_to_beetid(request.values.get('id')))
 
     album = g.lib.get_album(id)
     songs = sorted(album.items(), key=lambda song: song.track)
 
-    if (is_json(res_format)):
-        res = wrap_res("album", {
+    return subsonic_response(request, {
+        'album': {
             **map_album(album),
-            **{ "song": list(map(map_song, songs)) }
-        })
-        return jsonpify(request, res)
-    else:
-        root = get_xml_root()
-        albumXml = ET.SubElement(root, 'album')
-        map_album_xml(albumXml, album)
-
-        for song in songs:
-            s = ET.SubElement(albumXml, 'song')
-            map_song_xml(s, song)
-
-        return Response(xml_to_string(root), mimetype='text/xml')
+            "song": list(map(map_song, songs)),
+        }
+    })
 
 @app.route('/rest/getAlbumList', methods=["GET", "POST"])
 @app.route('/rest/getAlbumList.view', methods=["GET", "POST"])
