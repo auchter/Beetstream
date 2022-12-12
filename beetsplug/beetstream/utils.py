@@ -53,15 +53,6 @@ def subsonic_response(request, d):
     else:
         return jsonpify(request, response)
 
-def wrap_res(key, json):
-    return {
-        "subsonic-response": {
-            "status": "ok",
-            "version": "1.16.1",
-            key: json
-        }
-    }
-
 def jsonpify(request, data):
     if request.values.get("f") == "jsonp":
         callback = request.values.get("callback")
