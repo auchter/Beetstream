@@ -3,7 +3,6 @@ from beetsplug.beetstream import app
 from flask import g, request, Response
 import mimetypes
 from beets.random import random_objs
-import xml.etree.cElementTree as ET
 
 @app.route('/rest/getSong', methods=["GET", "POST"])
 @app.route('/rest/getSong.view', methods=["GET", "POST"])
