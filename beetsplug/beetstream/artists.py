@@ -84,33 +84,15 @@ def artist():
 @app.route('/rest/getArtistInfo2', methods=["GET", "POST"])
 @app.route('/rest/getArtistInfo2.view', methods=["GET", "POST"])
 def artistInfo2():
-    res_format = request.values.get('f') or 'xml'
     artist_name = artist_id_to_name(request.values.get('id'))
 
-    if (is_json(res_format)):
-        return jsonpify(request, wrap_res("artistInfo2", {
+    return subsonic_response(request, {
+        'artistInfo2': {
             "biography": f"wow. much artist. very {artist_name}",
             "musicBrainzId": "",
             "lastFmUrl": "",
             "smallImageUrl": "",
             "mediumImageUrl": "",
-            "largeImageUrl": ""
-        }))
-    else:
-        root = get_xml_root()
-        artist_xml = ET.SubElement(root, 'artistInfo2')
-
-        biography = ET.SubElement(artist_xml, "biography")
-        biography.text = f"wow. much artist very {artist_name}."
-        musicBrainzId = ET.SubElement(artist_xml, "musicBrainzId")
-        musicBrainzId.text = ""
-        lastFmUrl = ET.SubElement(artist_xml, "lastFmUrl")
-        lastFmUrl.text = ""
-        smallImageUrl = ET.SubElement(artist_xml, "smallImageUrl")
-        smallImageUrl.text = ""
-        mediumImageUrl = ET.SubElement(artist_xml, "mediumImageUrl")
-        mediumImageUrl.text = ""
-        largeImageUrl = ET.SubElement(artist_xml, "largeImageUrl")
-        largeImageUrl.text = ""
-
-        return Response(xml_to_string(root), mimetype='text/xml')
+            "largeImageUrl": "",
+        }
+    })
