@@ -34,7 +34,6 @@ def album_list_2():
     return get_album_list(2)
 
 def get_album_list(version):
-    res_format = request.values.get('f') or 'xml'
     # TODO type == 'starred' and type == 'frequent'
     sort_by = request.values.get('type') or 'alphabeticalByName'
     size = int(request.values.get('size') or 10)
@@ -71,34 +70,17 @@ def get_album_list(version):
     albums = handleSizeAndOffset(albums, size, offset)
 
     if version == 1:
-        if (is_json(res_format)):
-            return jsonpify(request, wrap_res("albumList", {
-                "album": list(map(map_album_list, albums))
-            }))
-        else:
-            root = get_xml_root()
-            album_list_xml = ET.SubElement(root, 'albumList')
-
-            for album in albums:
-                a = ET.SubElement(album_list_xml, 'album')
-                map_album_list_xml(a, album)
-
-            return Response(xml_to_string(root), mimetype='text/xml')
-
+        return subsonic_response(request, {
+            "albumList": {
+                "album": list(map(map_album_list, albums)),
+            }
+        })
     elif version == 2:
-        if (is_json(res_format)):
-            return jsonpify(request, wrap_res("albumList2", {
+        return subsonic_response(request, {
+            "albumList2": {
                 "album": list(map(map_album, albums))
-            }))
-        else:
-            root = get_xml_root()
-            album_list_xml = ET.SubElement(root, 'albumList2')
-
-            for album in albums:
-                a = ET.SubElement(album_list_xml, 'album')
-                map_album_xml(a, album)
-
-            return Response(xml_to_string(root), mimetype='text/xml')
+            }
+        })
 
 @app.route('/rest/getCoverArt', methods=["GET", "POST"])
 @app.route('/rest/getCoverArt.view', methods=["GET", "POST"])
