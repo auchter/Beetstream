@@ -153,7 +153,6 @@ def genres():
 def musicDirectory():
     # Works pretty much like a file system
     # Usually Artist first, than Album, than Songs
-    res_format = request.values.get('f') or 'xml'
     id = request.values.get('id')
 
     if id.startswith(ARTIST_ID_PREFIX):
@@ -162,55 +161,30 @@ def musicDirectory():
         albums = g.lib.albums(artist_name.replace("'", "\\'"))
         albums = filter(lambda album: album.albumartist == artist_name, albums)
 
-        if (is_json(res_format)):
-            return jsonpify(request, wrap_res("directory", {
+        return subsonic_response(request, {
+            "directory": {
                 "id": artist_id,
                 "name": artist_name,
                 "child": list(map(map_album, albums))
-            }))
-        else:
-            root = get_xml_root()
-            artist_xml = ET.SubElement(root, 'directory')
-            artist_xml.set("id", artist_id)
-            artist_xml.set("name", artist_name)
-
-            for album in albums:
-                a = ET.SubElement(artist_xml, 'child')
-                map_album_xml(a, album)
-
-            return Response(xml_to_string(root), mimetype='text/xml')
+            }
+        })
     elif id.startswith(ALBUM_ID_PREFIX):
         # Album
         id = int(album_subid_to_beetid(id))
         album = g.lib.get_album(id)
         songs = sorted(album.items(), key=lambda song: song.track)
 
-        if (is_json(res_format)):
-            res = wrap_res("directory", {
+        return subsonic_response(request, {
+            "directory": {
                 **map_album(album),
-                **{ "child": list(map(map_song, songs)) }
-            })
-            return jsonpify(request, res)
-        else:
-            root = get_xml_root()
-            albumXml = ET.SubElement(root, 'directory')
-            map_album_xml(albumXml, album)
-
-            for song in songs:
-                s = ET.SubElement(albumXml, 'child')
-                map_song_xml(s, song)
-
-            return Response(xml_to_string(root), mimetype='text/xml')
+                "child": list(map(map_song, songs))
+            }
+        })
     elif id.startswith(SONG_ID_PREFIX):
         # Song
         id = int(song_subid_to_beetid(id))
         song = g.lib.get_item(id)
 
-        if (is_json(res_format)):
-            return jsonpify(request, wrap_res("directory", map_song(song)))
-        else:
-            root = get_xml_root()
-            s = ET.SubElement(root, 'directory')
-            map_song_xml(s, song)
-
-            return Response(xml_to_string(root), mimetype='text/xml')
+        return subsonic_response(request, {
+            "directory": map_song(song)
+        })
