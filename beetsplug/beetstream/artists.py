@@ -68,29 +68,18 @@ def get_artists(version):
 @app.route('/rest/getArtist', methods=["GET", "POST"])
 @app.route('/rest/getArtist.view', methods=["GET", "POST"])
 def artist():
-    res_format = request.values.get('f') or 'xml'
     artist_id = request.values.get('id')
     artist_name = artist_id_to_name(artist_id)
     albums = g.lib.albums(artist_name.replace("'", "\\'"))
     albums = filter(lambda album: album.albumartist == artist_name, albums)
 
-    if (is_json(res_format)):
-        return jsonpify(request, wrap_res("artist", {
-            "id": artist_id,
-            "artist_name": artist_name,
-            "album": list(map(map_album, albums))
-        }))
-    else:
-        root = get_xml_root()
-        artist_xml = ET.SubElement(root, 'artist')
-        artist_xml.set("id", artist_id)
-        artist_xml.set("artist_name", artist_name)
-
-        for album in albums:
-            a = ET.SubElement(artist_xml, 'album')
-            map_album_xml(a, album)
-
-        return Response(xml_to_string(root), mimetype='text/xml')
+    return subsonic_response(request, {
+        'artist': {
+            'id': artist_id,
+            'artist_name': artist_name,
+            'album': list(map(map_album, albums)),
+        }
+    })
 
 @app.route('/rest/getArtistInfo2', methods=["GET", "POST"])
 @app.route('/rest/getArtistInfo2.view', methods=["GET", "POST"])
