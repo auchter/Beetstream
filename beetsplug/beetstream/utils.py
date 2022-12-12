@@ -16,9 +16,6 @@ def strip_accents(s):
 def timestamp_to_iso(timestamp):
     return datetime.fromtimestamp(int(timestamp)).isoformat()
 
-def is_json(res_format):
-    return res_format == 'json' or res_format == 'jsonp'
-
 def response_to_xml(d, parent=None):
     assert(len(d.keys()) == 1)
     name = list(d.keys())[0]
