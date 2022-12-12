@@ -19,6 +19,40 @@ def timestamp_to_iso(timestamp):
 def is_json(res_format):
     return res_format == 'json' or res_format == 'jsonp'
 
+def response_to_xml(d, parent=None):
+    assert(len(d.keys()) == 1)
+    name = list(d.keys())[0]
+
+    element = ET.Element(name) if parent is None else ET.SubElement(parent, name)
+    for k, v in d[name].items():
+        if type(v) is list:
+            for val in v:
+                sub = ET.SubElement(element, k, attrib={k: str(v) for k, v in val.items()})
+        elif type(v) is dict:
+            response_to_xml({k: v}, parent=element)
+        else:
+            element.set(k, str(v))
+
+    return element
+
+def subsonic_response(request, d):
+    fmt = request.values.get('f') or 'xml'
+
+    response = {
+        "subsonic-response": {
+            "status": "ok",
+            "version": "1.16.1",
+        }
+    }
+
+    response["subsonic-response"].update(d)
+    if fmt == "xml":
+        response["subsonic-response"]["xmlns"] = "http://subsonic.org/restapi"
+        xml = response_to_xml(response)
+        return flask.Response(xml_to_string(xml), mimetype='text/xml')
+    else:
+        return jsonpify(request, response)
+
 def wrap_res(key, json):
     return {
         "subsonic-response": {
