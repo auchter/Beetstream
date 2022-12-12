@@ -121,10 +121,6 @@ def map_album_list(album):
         "starred": ""
     }
 
-def map_album_list_xml(xml, album):
-    for k, v in map_album_list(album).items():
-        xml.set(k, str(v))
-
 def map_song(song):
     song = dict(song)
     path = song["path"].decode('utf-8')
