@@ -69,13 +69,6 @@ def jsonpify(request, data):
     else:
         return flask.jsonify(data)
 
-def get_xml_root():
-    root = ET.Element('subsonic-response')
-    root.set('xmlns', 'http://subsonic.org/restapi')
-    root.set('status', 'ok')
-    root.set('version', '1.16.1')
-    return root
-
 def xml_to_string(xml):
     # Add declaration: <?xml version="1.0" encoding="UTF-8"?>
     return minidom.parseString(ET.tostring(xml, encoding='unicode', method='xml', xml_declaration=True)).toprettyxml()
