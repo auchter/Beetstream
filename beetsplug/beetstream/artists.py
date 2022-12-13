@@ -74,12 +74,12 @@ def artistInfo2():
     artist_name = artist_id_to_name(request.values.get('id'))
 
     return subsonic_response(request, {
-        'artistInfo2': {
-            "biography": f"wow. much artist. very {artist_name}",
-            "musicBrainzId": "",
-            "lastFmUrl": "",
-            "smallImageUrl": "",
-            "mediumImageUrl": "",
-            "largeImageUrl": "",
+        Elem('artistInfo2'): {
+            Elem("biography"): f"wow. much artist. very {artist_name}",
+            Elem("musicBrainzId"): "",
+            Elem("lastFmUrl"): "",
+            Elem("smallImageUrl"): "",
+            Elem("mediumImageUrl"): "",
+            Elem("largeImageUrl"): "",
         }
     })
