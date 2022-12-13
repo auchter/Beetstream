@@ -74,9 +74,27 @@ def get_album_list(version):
     albums = handleSizeAndOffset(albums, size, offset)
 
     if version == 1:
+        def map_album(album):
+            album = dict(album)
+            return {
+                'id': album_beetid_to_subid(album['id']),
+                'parent': artist_name_to_id(album['albumartist']),
+                'isDir': True,
+                'title': album['album'],
+                'album': album['album'],
+                'artist': album['albumartist'],
+                'year': album['year'],
+                'coverArt': album_beetid_to_subid(album['id']),
+                'created': timestamp_to_iso(album['added']),
+                'playCount': 0,
+                # starred
+                # userRating
+                # averageRating
+            }
+
         return subsonic_response(request, {
             "albumList": {
-                "album": list(map(map_album_list, albums)),
+                "album": list(map(map_album, albums)),
             }
         })
     elif version == 2:

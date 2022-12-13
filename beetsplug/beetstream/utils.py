@@ -97,25 +97,6 @@ def map_album(album):
         "averageRating": 0 # TODO
     }
 
-def map_album_list(album):
-    album = dict(album)
-    return {
-        "id": album_beetid_to_subid(str(album["id"])),
-        "parent": artist_name_to_id(album["albumartist"]),
-        "isDir": True,
-        "title": album["album"],
-        "album": album["album"],
-        "artist": album["albumartist"],
-        "year": album["year"],
-        "genre": album["genre"],
-        "coverArt": album_beetid_to_subid(str(album["id"])) or "",
-        "userRating": 5, # TODO
-        "averageRating": 5, # TODO
-        "playCount": 1,  # TODO
-        "created": timestamp_to_iso(album["added"]),
-        "starred": ""
-    }
-
 def map_song(song):
     song = dict(song)
     path = song["path"].decode('utf-8')
