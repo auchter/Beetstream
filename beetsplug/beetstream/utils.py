@@ -5,8 +5,18 @@ import flask
 import json
 import base64
 import mimetypes
+import enum
 import xml.etree.cElementTree as ET
 from math import ceil
+
+class SubsonicErrorCode(enum.Enum):
+    GENERIC_ERROR = 0    # A generic error
+    MISSING_PARAM = 10   # Required parameter is missing.
+    CLIENT_TOO_OLD = 20  # Incompatible Subsonic REST protocol version. Client must upgrade.
+    SERVER_TOO_OLD = 30  # Incompatible Subsonic REST protocol version. Server must upgrade.
+    INVALID_AUTH = 40    # Wrong username or password.
+    UNAUTHORIZED = 50    # User is not authorized for the given operation.
+    NOT_FOUND = 70       # The requested data was not found.
 
 def strip_accents(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
