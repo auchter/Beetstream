@@ -24,23 +24,77 @@ def strip_accents(s):
 def timestamp_to_iso(timestamp):
     return datetime.fromtimestamp(int(timestamp)).isoformat()
 
+class Attr:
+    __xml_type__ = 'Attr'
+    def __init__(self, s):
+        self.s = s
+
+    def __str__(self):
+        return self.s
+
+    def __repr__(self):
+        return self.s
+
+class Elem:
+    __xml_type__ = 'Elem'
+    def __init__(self, s):
+        self.s = s
+
+    def __str__(self):
+        return self.s
+
+    def __repr__(self):
+        return self.s
+
+class ElemText:
+    def __init__(self, s):
+        self.s = s
+
+    def __str__(self):
+        return self.s
+
+    def __repr__(self):
+        return self.s
+
+def response_to_json(d):
+    ret = {}
+    for k, v in d.items():
+        if type(v) is dict:
+            ret[str(k)] = response_to_json(d[k])
+        else:
+            ret[str(k)] = v
+    return ret
+
 def response_to_xml(d, parent=None):
     assert(len(d.keys()) == 1)
     name = list(d.keys())[0]
 
     element = ET.Element(name) if parent is None else ET.SubElement(parent, name)
     for k, v in d[name].items():
-        if type(v) is list:
-            for val in v:
-                if type(val) is dict:
-                    response_to_xml({k: val}, parent=element)
-                else:
-                    sub = ET.SubElement(element, k)
-                    sub.text = str(val)
-        elif type(v) is dict:
-            response_to_xml({k: v}, parent=element)
-        else:
+        if isinstance(k, Attr):
+            k = k.s
             element.set(k, str(v))
+        elif isinstance(k, ElemText):
+            element.text = v
+        elif isinstance(k, Elem):
+            k = k.s
+            if type(v) is dict:
+                response_to_xml({k: v}, parent=element)
+            else:
+                sub = ET.SubElement(element, k)
+                sub.text = str(v)
+        else:
+            if type(v) is list:
+                for val in v:
+                    if type(val) is dict:
+                        response_to_xml({k: val}, parent=element)
+                    else:
+                        sub = ET.SubElement(element, k)
+                        sub.text = str(val)
+            elif type(v) is dict:
+                response_to_xml({k: v}, parent=element)
+            else:
+                element.set(k, str(v))
 
     return element
 
@@ -59,11 +113,13 @@ def subsonic_response(request, d, ok=True):
         response["subsonic-response"]["xmlns"] = "http://subsonic.org/restapi"
         xml = ET.tostring(response_to_xml(response), encoding='unicode')
         return flask.Response(xml, mimetype='text/xml')
-    elif fmt == "jsonp":
-        callback = request.values.get("callback")
-        return f"{callback}({json.dumps(response)});"
     else:
-        return flask.jsonify(response)
+        response = response_to_json(response)
+        if fmt == "jsonp":
+            callback = request.values.get("callback")
+            return f"{callback}({json.dumps(response)});"
+        else:
+            return flask.jsonify(response)
 
 def subsonic_response_error(request, code, message=""):
     d = {
