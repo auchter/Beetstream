@@ -15,24 +15,33 @@ def indexes():
 
 def get_artists(version):
     with g.lib.transaction() as tx:
-        rows = tx.query("SELECT DISTINCT albumartist FROM albums")
-    all_artists = [row[0] for row in rows]
-    all_artists.sort(key=lambda name: strip_accents(name).upper())
-    all_artists = filter(lambda name: len(name) > 0, all_artists)
+        rows = tx.query("SELECT DISTINCT albumartist, COUNT(*) FROM albums GROUP BY albumartist")
+
+    def row_to_artist(row):
+        return {
+            'name': row[0],
+            'id': artist_name_to_id(row[0]),
+            'coverArt': '',
+            'albumCount': row[1]
+        }
+
+    all_artists = [row_to_artist(row) for row in rows]
+    all_artists.sort(key=lambda artist: strip_accents(artist['name']).upper())
+    all_artists = filter(lambda artist: len(artist['name']) > 0, all_artists)
 
     indicies_dict = {}
 
-    for name in all_artists:
-        index = strip_accents(name[0]).upper()
+    for artist in all_artists:
+        index = strip_accents(artist['name'][0]).upper()
         if index not in indicies_dict:
             indicies_dict[index] = []
-        indicies_dict[index].append(name)
+        indicies_dict[index].append(artist)
 
     indicies = []
-    for index, artist_names in indicies_dict.items():
+    for index, artist in indicies_dict.items():
         indicies.append({
             "name": index,
-            "artist": list(map(map_artist, artist_names))
+            "artist": artist,
         })
 
     return subsonic_response(request, {
