@@ -5,7 +5,6 @@ import flask
 import json
 import base64
 import mimetypes
-import os
 import xml.etree.cElementTree as ET
 from math import ceil
 
@@ -102,7 +101,7 @@ def map_song(item):
         "year": item.year,
         "genre": item.genre,
         "coverArt": album_beetid_to_subid(str(item.album_id)) or "",
-        "size": os.path.getsize(path),
+        "size": item.filesize,
         "contentType": mimetypes.guess_type(path)[0],
         "suffix": item.format.lower(),
         "duration": ceil(item.length),
