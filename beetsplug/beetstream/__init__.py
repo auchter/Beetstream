@@ -42,6 +42,7 @@ import beetsplug.beetstream.dummy
 import beetsplug.beetstream.search
 import beetsplug.beetstream.songs
 import beetsplug.beetstream.users
+import beetsplug.beetstream.auth
 
 # Plugin hook.
 class BeetstreamPlugin(BeetsPlugin):
@@ -73,6 +74,8 @@ class BeetstreamPlugin(BeetsPlugin):
             app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
             app.config['INCLUDE_PATHS'] = self.config['include_paths']
+
+            app.config['config'] = self.config
 
             # Enable CORS if required.
             if self.config['cors']:
