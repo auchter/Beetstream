@@ -8,7 +8,6 @@ import mimetypes
 import os
 import xml.etree.cElementTree as ET
 from math import ceil
-from xml.dom import minidom
 
 def strip_accents(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
@@ -49,8 +48,8 @@ def subsonic_response(request, d, ok=True):
 
     if fmt == "xml":
         response["subsonic-response"]["xmlns"] = "http://subsonic.org/restapi"
-        xml = response_to_xml(response)
-        return flask.Response(xml_to_string(xml), mimetype='text/xml')
+        xml = ET.tostring(response_to_xml(response), encoding='unicode')
+        return flask.Response(xml, mimetype='text/xml')
     elif fmt == "jsonp":
         callback = request.values.get("callback")
         return f"{callback}({json.dumps(response)});"
@@ -66,10 +65,6 @@ def subsonic_response_error(request, code, message=""):
     }
 
     return subsonic_response(request, d, ok=False)
-
-def xml_to_string(xml):
-    # Add declaration: <?xml version="1.0" encoding="UTF-8"?>
-    return minidom.parseString(ET.tostring(xml, encoding='unicode', method='xml', xml_declaration=True)).toprettyxml()
 
 def map_album(album):
     album = dict(album)
