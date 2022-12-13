@@ -66,23 +66,22 @@ def subsonic_response_error(request, code, message=""):
     return subsonic_response(request, d, ok=False)
 
 def map_album(album):
-    album = dict(album)
     return {
-        "id": album_beetid_to_subid(str(album["id"])),
-        "name": album["album"],
-        "title": album["album"],
-        "album": album["album"],
-        "artist": album["albumartist"],
-        "artistId": artist_name_to_id(album["albumartist"]),
-        "parent": artist_name_to_id(album["albumartist"]),
+        "id": album_beetid_to_subid(str(album.id)),
+        "name": album.album,
+        "title": album.album,
+        "album": album.album,
+        "artist": album.albumartist,
+        "artistId": artist_name_to_id(album.albumartist),
+        "parent": artist_name_to_id(album.albumartist),
         "isDir": True,
-        "coverArt": album_beetid_to_subid(str(album["id"])) or "",
+        "coverArt": album_beetid_to_subid(str(album.id)) or "",
         "songCount": 1, # TODO
         "duration": 1, # TODO
         "playCount": 1, # TODO
-        "created": timestamp_to_iso(album["added"]),
-        "year": album["year"],
-        "genre": album["genre"],
+        "created": timestamp_to_iso(album.added),
+        "year": album.year,
+        "genre": album.genre,
         "starred": "1970-01-01T00:00:00.000Z", # TODO
         "averageRating": 0 # TODO
     }
