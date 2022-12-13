@@ -51,8 +51,11 @@ def subsonic_response(request, d, ok=True):
         response["subsonic-response"]["xmlns"] = "http://subsonic.org/restapi"
         xml = response_to_xml(response)
         return flask.Response(xml_to_string(xml), mimetype='text/xml')
+    elif fmt == "jsonp":
+        callback = request.values.get("callback")
+        return f"{callback}({json.dumps(response)});"
     else:
-        return jsonpify(request, response)
+        return flask.jsonify(response)
 
 def subsonic_response_error(request, code, message=""):
     d = {
@@ -63,13 +66,6 @@ def subsonic_response_error(request, code, message=""):
     }
 
     return subsonic_response(request, d, ok=False)
-
-def jsonpify(request, data):
-    if request.values.get("f") == "jsonp":
-        callback = request.values.get("callback")
-        return f"{callback}({json.dumps(data)});"
-    else:
-        return flask.jsonify(data)
 
 def xml_to_string(xml):
     # Add declaration: <?xml version="1.0" encoding="UTF-8"?>
