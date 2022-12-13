@@ -156,35 +156,27 @@ def cover_art_file():
 @app.route('/rest/getGenres.view', methods=["GET", "POST"])
 def genres():
     with g.lib.transaction() as tx:
-        mixed_genres = list(tx.query("""
-            SELECT genre, COUNT(*) AS n_song, "" AS n_album FROM items GROUP BY genre
-            UNION ALL
-            SELECT genre, "" AS n_song, COUNT(*) AS n_album FROM albums GROUP BY genre
-        """))
+        def get_genres(table):
+            return {k: v for k, v in tx.query(f"SELECT genre, COUNT(*) FROM {table} GROUP BY genre") if k != ''}
+        item_genres = get_genres("items")
+        album_genres = get_genres("albums")
 
-    genres = {}
-    for genre in mixed_genres:
-        key = genre[0]
-        if (not key in genres.keys()):
-            genres[key] = (genre[1], 0)
-        if (genre[2]):
-            genres[key] = (genres[key][0], genre[2])
-
-    genres = [(k, v[0], v[1]) for k, v in genres.items()]
-    # genres.sort(key=lambda genre: strip_accents(genre[0]).upper())
-    genres.sort(key=lambda genre: genre[1])
-    genres.reverse()
-    genres = filter(lambda genre: genre[0] != u"", genres)
-
-    def map_genre(genre):
+    def mk_genre(genre):
         return {
-            "value": genre[0],
-            "songCount": genre[1],
-            "albumCount": genre[2]
+            ElemText("value"): genre,
+            "songCount": item_genres.get(genre, 0),
+            "albumCount": album_genres.get(genre, 0)
         }
 
+    all_genres = set(item_genres.keys()) | set(album_genres.keys())
+    genres = [mk_genre(genre) for genre in all_genres]
+    genres.sort(key=lambda genre: genre['albumCount'])
+    genres.reverse()
+
     return subsonic_response(request, {
-        "genre": list(map(map_genre, genres))
+        "genres": {
+            "genre": genres,
+        }
     })
 
 @app.route('/rest/getMusicDirectory', methods=["GET", "POST"])
