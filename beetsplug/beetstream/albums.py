@@ -49,25 +49,25 @@ def get_album_list(version):
     albums = list(g.lib.albums())
 
     if sort_by == 'newest':
-        albums.sort(key=lambda album: int(dict(album)['added']), reverse=True)
+        albums.sort(key=lambda album: int(album.added), reverse=True)
     elif sort_by == 'alphabeticalByName':
-        albums.sort(key=lambda album: strip_accents(dict(album)['album']).upper())
+        albums.sort(key=lambda album: strip_accents(album.album).upper())
     elif sort_by == 'alphabeticalByArtist':
-        albums.sort(key=lambda album: strip_accents(dict(album)['albumartist']).upper())
+        albums.sort(key=lambda album: strip_accents(album.albumartist).upper())
     elif sort_by == 'alphabeticalByArtist':
-        albums.sort(key=lambda album: strip_accents(dict(album)['albumartist']).upper())
+        albums.sort(key=lambda album: strip_accents(album.albumartist).upper())
     elif sort_by == 'recent':
-        albums.sort(key=lambda album: dict(album)['year'], reverse=True)
+        albums.sort(key=lambda album: album.year, reverse=True)
     elif sort_by == 'byGenre':
-        albums = list(filter(lambda album: dict(album)['genre'].lower() == genre.lower(), albums))
+        albums = list(filter(lambda album: album.genre.lower() == genre.lower(), albums))
     elif sort_by == 'byYear':
         # TODO use month and day data to sort
         if fromYear <= toYear:
-            albums = list(filter(lambda album: dict(album)['year'] >= fromYear and dict(album)['year'] <= toYear, albums))
-            albums.sort(key=lambda album: int(dict(album)['year']))
+            albums = list(filter(lambda album: album.year >= fromYear and album.year <= toYear, albums))
+            albums.sort(key=lambda album: int(album.year))
         else:
-            albums = list(filter(lambda album: dict(album)['year'] >= toYear and dict(album)['year'] <= fromYear, albums))
-            albums.sort(key=lambda album: int(dict(album)['year']), reverse=True)
+            albums = list(filter(lambda album: album.year >= toYear and album.year <= fromYear, albums))
+            albums.sort(key=lambda album: int(album.year), reverse=True)
     elif sort_by == 'random':
         shuffle(albums)
 
@@ -75,17 +75,16 @@ def get_album_list(version):
 
     if version == 1:
         def map_album(album):
-            album = dict(album)
             return {
-                'id': album_beetid_to_subid(album['id']),
-                'parent': artist_name_to_id(album['albumartist']),
+                'id': album_beetid_to_subid(album.id),
+                'parent': artist_name_to_id(album.albumartist),
                 'isDir': True,
-                'title': album['album'],
-                'album': album['album'],
-                'artist': album['albumartist'],
-                'year': album['year'],
-                'coverArt': album_beetid_to_subid(album['id']),
-                'created': timestamp_to_iso(album['added']),
+                'title': album.album,
+                'album': album.album,
+                'artist': album.albumartist,
+                'year': album.year,
+                'coverArt': album_beetid_to_subid(album.id),
+                'created': timestamp_to_iso(album.added),
                 'playCount': 0,
                 # starred
                 # userRating
@@ -99,23 +98,22 @@ def get_album_list(version):
         })
     elif version == 2:
         def map_album(album):
-            album = dict(album)
             query = AndQuery([
                 MatchQuery("album", album['album']),
                 MatchQuery("albumartist", album['albumartist']),
             ])
             items = g.lib.items(query=query)
             return {
-                'id': album_beetid_to_subid(album['id']),
-                'name': album['album'],
-                'artist': album['albumartist'],
-                'artistId': artist_name_to_id(album['albumartist']),
-                'coverArt': album_beetid_to_subid(album['id']),
+                'id': album_beetid_to_subid(album.id),
+                'name': album.album,
+                'artist': album.albumartist,
+                'artistId': artist_name_to_id(album.albumartist),
+                'coverArt': album_beetid_to_subid(album.id),
                 'songCount': len(items),
                 'duration': int(sum([item['length'] for item in items])),
-                'created': timestamp_to_iso(album['added']),
-                'year': album['year'],
-                'genre': album['genre'],
+                'created': timestamp_to_iso(album.added),
+                'year': album.year,
+                'genre': album.genre,
             }
         return subsonic_response(request, {
             "albumList2": {
