@@ -63,7 +63,7 @@ def artist():
     return subsonic_response(request, {
         'artist': {
             'id': artist_id,
-            'artist_name': artist_name,
+            'name': artist_name,
             'album': list(map(map_album, albums)),
         }
     })
