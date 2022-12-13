@@ -88,32 +88,31 @@ def map_album(album):
         "averageRating": 0 # TODO
     }
 
-def map_song(song):
-    song = dict(song)
-    path = song["path"].decode('utf-8')
+def map_song(item):
+    path = item.path.decode('utf-8')
     return {
-        "id": song_beetid_to_subid(str(song["id"])),
-        "parent": album_beetid_to_subid(str(song["album_id"])),
+        "id": song_beetid_to_subid(str(item.id)),
+        "parent": album_beetid_to_subid(str(item.album_id)),
         "isDir": False,
-        "title": song["title"],
-        "name": song["title"],
-        "album": song["album"],
-        "artist": song["albumartist"],
-        "track": song["track"],
-        "year": song["year"],
-        "genre": song["genre"],
-        "coverArt": album_beetid_to_subid(str(song["album_id"])) or "",
+        "title": item.title,
+        "name": item.title,
+        "album": item.album,
+        "artist": item.albumartist,
+        "track": item.track,
+        "year": item.year,
+        "genre": item.genre,
+        "coverArt": album_beetid_to_subid(str(item.album_id)) or "",
         "size": os.path.getsize(path),
         "contentType": mimetypes.guess_type(path)[0],
-        "suffix": song["format"].lower(),
-        "duration": ceil(song["length"]),
-        "bitRate": ceil(song["bitrate"]/1000),
+        "suffix": item.format.lower(),
+        "duration": ceil(item.length),
+        "bitRate": ceil(item.bitrate/1000),
         "path": path,
         "playCount": 1, #TODO
-        "created": timestamp_to_iso(song["added"]),
+        "created": timestamp_to_iso(item.added),
         # "starred": "2019-10-23T04:41:17.107Z",
-        "albumId": album_beetid_to_subid(str(song["album_id"])),
-        "artistId": artist_name_to_id(song["albumartist"]),
+        "albumId": album_beetid_to_subid(str(item.album_id)),
+        "artistId": artist_name_to_id(item.albumartist),
         "type": "music"
     }
 
