@@ -75,10 +75,17 @@ def artist():
 def artistInfo2():
     artist_name = artist_id_to_name(request.values.get('id'))
 
+    albums = g.lib.albums(artist_name.replace("'", "\\'"))
+    albums = filter(lambda album: album.albumartist == artist_name, albums)
+    mbid_list = sorted([album.mb_albumartistid for album in albums])
+    mbid_counts = {item: mbid_list.count(item) for item in mbid_list}
+
+    mbid = sorted(mbid_counts, key=lambda k: mbid_counts[k])[-1]
+
     return subsonic_response(request, {
         Elem('artistInfo2'): {
-            Elem("biography"): f"wow. much artist. very {artist_name}",
-            Elem("musicBrainzId"): "",
+            Elem("biography"): f"wow. much artist. very {artist_name}, {mbid}",
+            Elem("musicBrainzId"): mbid,
             Elem("lastFmUrl"): "",
             Elem("smallImageUrl"): "",
             Elem("mediumImageUrl"): "",
