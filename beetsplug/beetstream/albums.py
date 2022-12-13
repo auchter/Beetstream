@@ -5,6 +5,11 @@ from flask import g, request
 from PIL import Image
 import io
 from random import shuffle
+from beets.dbcore.query import (
+    AndQuery,
+    MatchQuery,
+)
+
 
 @app.route('/rest/getAlbum', methods=["GET", "POST"])
 @app.route('/rest/getAlbum.view', methods=["GET", "POST"])
@@ -75,6 +80,25 @@ def get_album_list(version):
             }
         })
     elif version == 2:
+        def map_album(album):
+            album = dict(album)
+            query = AndQuery([
+                MatchQuery("album", album['album']),
+                MatchQuery("albumartist", album['albumartist']),
+            ])
+            items = g.lib.items(query=query)
+            return {
+                'id': album_beetid_to_subid(album['id']),
+                'name': album['album'],
+                'artist': album['albumartist'],
+                'artistId': artist_name_to_id(album['albumartist']),
+                'coverArt': album_beetid_to_subid(album['id']),
+                'songCount': len(items),
+                'duration': int(sum([item['length'] for item in items])),
+                'created': timestamp_to_iso(album['added']),
+                'year': album['year'],
+                'genre': album['genre'],
+            }
         return subsonic_response(request, {
             "albumList2": {
                 "album": list(map(map_album, albums))
