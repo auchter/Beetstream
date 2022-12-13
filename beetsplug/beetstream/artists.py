@@ -59,12 +59,14 @@ def artist():
     artist_name = artist_id_to_name(artist_id)
     albums = g.lib.albums(artist_name.replace("'", "\\'"))
     albums = filter(lambda album: album.albumartist == artist_name, albums)
+    albums = list(map(map_album, albums))
 
     return subsonic_response(request, {
         'artist': {
-            'id': artist_id,
-            'name': artist_name,
-            'album': list(map(map_album, albums)),
+            Attr('id'): artist_id,
+            Attr('name'): artist_name,
+            Attr('albumCount'): len(albums),
+            'album': albums,
         }
     })
 
