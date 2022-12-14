@@ -1,6 +1,10 @@
 from beetsplug.beetstream.utils import *
 from beetsplug.beetstream import app
 from flask import g, request
+from beets.dbcore.query import (
+    AndQuery,
+    MatchQuery,
+)
 
 @app.route('/rest/search2', methods=["GET", "POST"])
 @app.route('/rest/search2.view', methods=["GET", "POST"])
@@ -38,3 +42,27 @@ def search(version):
             "song": list(map(map_song, songs))
         }
     })
+
+@app.route('/rest/getLyrics', methods=["GET", "POST"])
+@app.route('/rest/getLyrics.view', methods=["GET", "POST"])
+def getLyrics():
+    artist = request.values.get("artist") or ""
+    title = request.values.get("title") or ""
+
+    query = AndQuery([
+        MatchQuery("artist", artist),
+        MatchQuery("title", title),
+    ])
+    items = g.lib.items(query=query)
+
+    if len(items) > 0:
+        item = items[0]
+
+    return subsonic_response(request, {
+        "lyrics": {
+            Attr("artist"): item.artist,
+            Attr("title"): item.title,
+            ElemText("value"): item.lyrics,
+        }
+    })
+
