@@ -5,9 +5,10 @@ from flask import g, request
 @app.route('/rest/getUser', methods=["GET", "POST"])
 @app.route('/rest/getUser.view', methods=["GET", "POST"])
 def user():
+    username = request.values.get('username')
     return subsonic_response(request, {
         "user": {
-            "username" : "admin",
+            "username" : username,
             "email" : "foo@example.com",
             "scrobblingEnabled" : True,
             "adminRole" : True,
