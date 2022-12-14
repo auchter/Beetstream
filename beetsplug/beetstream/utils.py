@@ -66,6 +66,11 @@ def response_to_json(d):
     return ret
 
 def response_to_xml(d, parent=None):
+    def stringify(v):
+        if type(v) is bool:
+            return "true" if v else "false"
+        return str(v)
+
     assert(len(d.keys()) == 1)
     name = list(d.keys())[0]
 
@@ -73,7 +78,7 @@ def response_to_xml(d, parent=None):
     for k, v in d[name].items():
         if isinstance(k, Attr):
             k = k.s
-            element.set(k, str(v))
+            element.set(k, stringify(v))
         elif isinstance(k, ElemText):
             element.text = v
         elif isinstance(k, Elem):
@@ -82,7 +87,7 @@ def response_to_xml(d, parent=None):
                 response_to_xml({k: v}, parent=element)
             else:
                 sub = ET.SubElement(element, k)
-                sub.text = str(v)
+                sub.text = stringify(v)
         else:
             if type(v) is list:
                 for val in v:
@@ -90,11 +95,11 @@ def response_to_xml(d, parent=None):
                         response_to_xml({k: val}, parent=element)
                     else:
                         sub = ET.SubElement(element, k)
-                        sub.text = str(val)
+                        sub.text = stringify(val)
             elif type(v) is dict:
                 response_to_xml({k: v}, parent=element)
             else:
-                element.set(k, str(v))
+                element.set(k, stringify(v))
 
     return element
 
