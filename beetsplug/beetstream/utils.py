@@ -9,7 +9,7 @@ import enum
 import xml.etree.cElementTree as ET
 from math import ceil
 
-class SubsonicErrorCode(enum.Enum):
+class SubsonicErrorCode(enum.IntEnum):
     GENERIC_ERROR = 0    # A generic error
     MISSING_PARAM = 10   # Required parameter is missing.
     CLIENT_TOO_OLD = 20  # Incompatible Subsonic REST protocol version. Client must upgrade.
