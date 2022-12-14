@@ -57,13 +57,18 @@ class ElemText:
         return self.s
 
 def response_to_json(d):
-    ret = {}
-    for k, v in d.items():
-        if type(v) is dict:
-            ret[str(k)] = response_to_json(d[k])
-        else:
-            ret[str(k)] = v
-    return ret
+    if type(d) is dict:
+        ret = {}
+        for k, v in d.items():
+            if type(v) is dict:
+                ret[str(k)] = response_to_json(d[k])
+            elif type(v) is list:
+                ret[str(k)] = [response_to_json(val) for val in v]
+            else:
+                ret[str(k)] = v
+        return ret
+    else:
+        return d
 
 def response_to_xml(d, parent=None):
     def stringify(v):
