@@ -6,11 +6,17 @@ from flask import g, request
 @app.route('/rest/getUser.view', methods=["GET", "POST"])
 def user():
     username = request.values.get('username')
+    config = app.config['config']['users'][username]
+
+    scrobble = False
+    if 'scrobble' in config:
+        scrobble = config['scrobble'].get(bool)
+
     return subsonic_response(request, {
         "user": {
             "username" : username,
             "email" : "foo@example.com",
-            "scrobblingEnabled" : False,
+            "scrobblingEnabled" : scrobble,
             "adminRole" : True,
             "settingsRole" : True,
             "downloadRole" : True,
