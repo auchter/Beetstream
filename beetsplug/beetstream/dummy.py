@@ -3,8 +3,6 @@ from beetsplug.beetstream import app
 from flask import request
 
 # Fake endpoint to avoid some apps errors
-@app.route('/rest/scrobble', methods=["GET", "POST"])
-@app.route('/rest/scrobble.view', methods=["GET", "POST"])
 @app.route('/rest/ping', methods=["GET", "POST"])
 @app.route('/rest/ping.view', methods=["GET", "POST"])
 def ping():
