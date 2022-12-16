@@ -4,17 +4,25 @@ from hashlib import md5
 import flask
 from flask import request
 
+password_cache = {}
+
 def get_password(user):
+    if user in password_cache:
+        return password_cache[user]
+
     users = app.config['config']['users']
     if user not in users:
         return None
     user_conf = users[user]
-    if 'password' in users[user]:
-        return users[user]['password']
+
+    if 'password' in user_conf:
+        password = user_conf['password']
     elif 'passwordFile' in users[user]:
-        with open(users[user]['passwordFile'], 'r') as f:
-            return f.read()
-    return None
+        with open(user_conf['passwordFile'], 'r') as f:
+            password = f.read()
+
+    password_cache[user] = password
+    return password
 
 def authorized(password, salt, token):
     concat = (str(password) + salt).encode('utf-8')
