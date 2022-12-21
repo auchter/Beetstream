@@ -43,6 +43,7 @@ import beetsplug.beetstream.search
 import beetsplug.beetstream.songs
 import beetsplug.beetstream.users
 import beetsplug.beetstream.auth
+import beetsplug.beetstream.queue
 
 # Plugin hook.
 class BeetstreamPlugin(BeetsPlugin):
