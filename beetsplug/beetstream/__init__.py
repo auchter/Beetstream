@@ -19,6 +19,7 @@ from beets import ui
 import flask
 from flask import g
 from flask_cors import CORS
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 ARTIST_ID_PREFIX = "1"
 ALBUM_ID_PREFIX = "2"
@@ -96,6 +97,7 @@ class BeetstreamPlugin(BeetsPlugin):
             # Allow serving behind a reverse proxy
             if self.config['reverse_proxy']:
                 app.wsgi_app = ReverseProxied(app.wsgi_app)
+                app.wsgi_app = ProxyFix(app.wsgi_app)
 
             # Start the web application.
             app.run(host=self.config['host'].as_str(),
