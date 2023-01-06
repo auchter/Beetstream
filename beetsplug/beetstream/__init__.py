@@ -24,6 +24,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 ARTIST_ID_PREFIX = "1"
 ALBUM_ID_PREFIX = "2"
 SONG_ID_PREFIX = "3"
+PLAYLIST_ID_PREFIX = "4"
 
 # Flask setup.
 app = flask.Flask(__name__)
@@ -45,6 +46,7 @@ import beetsplug.beetstream.songs
 import beetsplug.beetstream.users
 import beetsplug.beetstream.auth
 import beetsplug.beetstream.queue
+import beetsplug.beetstream.playlist
 
 # Plugin hook.
 class BeetstreamPlugin(BeetsPlugin):
@@ -57,6 +59,7 @@ class BeetstreamPlugin(BeetsPlugin):
             'cors_supports_credentials': True,
             'reverse_proxy': False,
             'include_paths': False,
+            'playlist_dir': None,
         })
 
     def commands(self):

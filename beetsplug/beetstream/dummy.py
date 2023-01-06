@@ -19,16 +19,6 @@ def getLicense():
         }
     })
 
-# TODO link with https://beets.readthedocs.io/en/stable/plugins/playlist.html
-@app.route('/rest/getPlaylists', methods=["GET", "POST"])
-@app.route('/rest/getPlaylists.view', methods=["GET", "POST"])
-def playlists():
-    return subsonic_response(request, {
-        "playlists": {
-            "playlist": []
-        }
-    })
-
 @app.route('/rest/getMusicFolders', methods=["GET", "POST"])
 @app.route('/rest/getMusicFolders.view', methods=["GET", "POST"])
 def music_folder():

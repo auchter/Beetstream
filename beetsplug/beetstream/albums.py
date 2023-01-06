@@ -124,6 +124,10 @@ def get_album_list(version):
 @app.route('/rest/getCoverArt', methods=["GET", "POST"])
 @app.route('/rest/getCoverArt.view', methods=["GET", "POST"])
 def cover_art_file():
+    cid = request.values.get('id') or ''
+    if cid == 'playlist' or cid.startswith('pl-'):
+        flask.abort(404)
+
     query_id = int(album_subid_to_beetid(request.values.get('id')) or -1)
     size = request.values.get('size')
     album = g.lib.get_album(query_id)
