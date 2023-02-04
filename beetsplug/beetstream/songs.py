@@ -6,6 +6,7 @@ from beets.random import random_objs
 import time
 import datetime
 import pylast
+import pylistenbrainz
 
 @app.route('/rest/getSong', methods=["GET", "POST"])
 @app.route('/rest/getSong.view', methods=["GET", "POST"])
@@ -57,8 +58,40 @@ def stream(maxBitrate):
     return Response(generate(), mimetype=mimetypes.guess_type(item.path.decode('utf-8'))[0])
 
 def do_scrobble(item, timestamp, submission):
-    # TODO: Other endpoints
-    config = app.config['config']['scrobble']['last.fm']
+    config = app.config['config']['scrobble']
+    endpoints = {
+        'last.fm': do_scrobble_lastfm,
+        'listenbrainz': do_scrobble_listenbrainz,
+    }
+
+    for k, func in endpoints.items():
+        if k in config:
+            func(config[k], item, timestamp, submission)
+
+
+def do_scrobble_listenbrainz(config, item, timestamp, submission):
+    listen = pylistenbrainz.Listen(
+        track_name=item.title,
+        artist_name=item.artist,
+        release_name=item.album,
+        recording_mbid=item.mb_trackid,
+        artist_mbids=[item.mb_artistid],
+        release_mbid=item.mb_albumid,
+        release_group_mbid=item.mb_releasegroupid,
+        work_mbids=[item.mb_workid],
+        tracknumber=item.track,
+        listening_from='beetstream')
+
+    client = pylistenbrainz.client.ListenBrainz()
+    client.set_auth_token(config['password'].get(str))
+    if submission:
+        listen.listened_at = timestamp,
+        client.submit_single_listen(listen)
+    else:
+        client.submit_playing_now(listen)
+
+
+def do_scrobble_lastfm(config, item, timestamp, submission):
     lfm = pylast.LastFMNetwork(
             api_key=config['api_key'].get(str),
             api_secret=config['api_secret'].get(str),
