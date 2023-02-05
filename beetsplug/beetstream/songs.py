@@ -84,11 +84,14 @@ def do_scrobble_listenbrainz(config, item, timestamp, submission):
 
     client = pylistenbrainz.client.ListenBrainz()
     client.set_auth_token(config['password'].get(str))
-    if submission:
-        listen.listened_at = timestamp,
-        client.submit_single_listen(listen)
-    else:
-        client.submit_playing_now(listen)
+    try:
+        if submission:
+            listen.listened_at = timestamp,
+            client.submit_single_listen(listen)
+        else:
+            client.submit_playing_now(listen)
+    except pylistenbrainz.errors.ListenBrainzAPIException as e:
+        app.logger.error("listenbrainz error: " + str(e.message))
 
 
 def do_scrobble_lastfm(config, item, timestamp, submission):
