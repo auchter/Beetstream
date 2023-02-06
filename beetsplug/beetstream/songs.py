@@ -61,6 +61,7 @@ def do_scrobble(config, item, timestamp, submission):
     endpoints = {
         'last.fm': do_scrobble_lastfm,
         'listenbrainz': do_scrobble_listenbrainz,
+        'log': do_scrobble_log,
     }
 
     for k, func in endpoints.items():
@@ -119,6 +120,15 @@ def do_scrobble_lastfm(config, item, timestamp, submission):
             duration=item.length,
             track_number=item.track,
             mbid=item.mb_trackid)
+
+
+def do_scrobble_log(config, item, timestamp, submission):
+    if not submission:
+        return
+
+    user = request.values.get('u')
+    app.logger.info(f"{user} listened to {item.artist} - {item.album} - {item.title}")
+
 
 @app.route('/rest/scrobble', methods=["GET", "POST"])
 @app.route('/rest/scrobble.view', methods=["GET", "POST"])
