@@ -8,9 +8,7 @@ def user():
     username = request.values.get('username')
     config = app.config['config']['users'][username]
 
-    scrobble = False
-    if 'scrobble' in config:
-        scrobble = config['scrobble'].get(bool)
+    scrobble = 'scrobble' in config
 
     return subsonic_response(request, {
         "user": {

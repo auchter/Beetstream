@@ -57,8 +57,7 @@ def stream(maxBitrate):
                 data = songFile.read(1024)
     return Response(generate(), mimetype=mimetypes.guess_type(item.path.decode('utf-8'))[0])
 
-def do_scrobble(item, timestamp, submission):
-    config = app.config['config']['scrobble']
+def do_scrobble(config, item, timestamp, submission):
     endpoints = {
         'last.fm': do_scrobble_lastfm,
         'listenbrainz': do_scrobble_listenbrainz,
@@ -83,7 +82,7 @@ def do_scrobble_listenbrainz(config, item, timestamp, submission):
         listening_from='beetstream')
 
     client = pylistenbrainz.client.ListenBrainz()
-    client.set_auth_token(config['password'].get(str))
+    client.set_auth_token(config['user_token'].get(str))
     try:
         if submission:
             listen.listened_at = int(timestamp)
@@ -126,7 +125,7 @@ def do_scrobble_lastfm(config, item, timestamp, submission):
 def scrobble():
     user = request.values.get('u')
     user_config = app.config['config']['users'][user]
-    if 'scrobble' not in user_config or not user_config['scrobble'].get(bool):
+    if 'scrobble' not in user_config:
         return subsonic_response(request, {})
 
     ids = [int(song_subid_to_beetid(id)) for id in request.values.getlist('id')]
@@ -142,7 +141,7 @@ def scrobble():
 
     for id, timestamp in zip(ids, times):
         item = g.lib.get_item(id)
-        do_scrobble(item, timestamp, submission)
+        do_scrobble(user_config['scrobble'], item, timestamp, submission)
 
     return subsonic_response(request, {})
 
