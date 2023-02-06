@@ -86,7 +86,7 @@ def do_scrobble_listenbrainz(config, item, timestamp, submission):
     client.set_auth_token(config['password'].get(str))
     try:
         if submission:
-            listen.listened_at = timestamp,
+            listen.listened_at = int(timestamp)
             client.submit_single_listen(listen)
         else:
             client.submit_playing_now(listen)
